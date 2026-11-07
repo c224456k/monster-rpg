@@ -328,7 +328,7 @@ class Game {
     if (r === 'lose') {
       if (opt.canLose) { this.healParty(); return r; }
       await this.say(`${this.p.name}沒有可以戰鬥的萌獸了…`);
-      const lost = Math.floor(this.p.money / 2);
+      const lost = Math.min(this.p.money, 10000); // 全滅最多扣 1 萬
       this.p.money -= lost;
       await this.say(`${this.p.name}慌張地掉了\n$${lost}……\n眼前一片漆黑！`);
       await this.fadeOut(20);

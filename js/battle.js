@@ -326,13 +326,13 @@ class Battle {
   }
   async giveXp() {
     const g = this.g, e = this.em;
-    const total = Math.floor(SPECIES[e.id].x * e.lv / 7 * (this.tr ? 1.5 : 1));
-    const parts = [...this.parts].filter((i) => g.p.party[i] && g.p.party[i].hp > 0);
+    // 經驗值×1.5，而且隊伍裡每一隻還站得住的萌獸都拿到全額（不用平分、不用上場）
+    const gain = Math.max(1, Math.floor(SPECIES[e.id].x * e.lv / 7 * (this.tr ? 1.5 : 1) * 1.5));
+    const parts = g.p.party.map((m, i) => i).filter((i) => g.p.party[i].hp > 0 && g.p.party[i].lv < 100);
+    if (parts.length) await this.say(parts.length > 1 ? `全隊萌獸各得到了\n${gain} 點經驗值！` : `${monName(g.p.party[parts[0]])}得到了\n${gain} 點經驗值！`);
     for (const i of parts) {
-      const m = g.p.party[i], gain = Math.max(1, Math.floor(total / parts.length));
-      if (m.lv >= 100) continue;
+      const m = g.p.party[i];
       m.xp += gain;
-      await this.say(`${monName(m)}得到了\n${gain} 點經驗值！`);
       while (m.lv < 100 && m.xp >= xpForLevel(m.lv + 1)) {
         const old = maxHp(m);
         m.lv++;
