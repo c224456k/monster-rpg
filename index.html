@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#3a3a5a">
+<title>萌獸大冒險</title>
+<style>
+@font-face { font-family: 'Cubic11'; src: url('fonts/Cubic_11.woff2') format('woff2'); font-display: block; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: #3a3a5a; color: #f8f8f0; font-family: Cubic11, sans-serif; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+#app { height: 100%; display: flex; flex-direction: column; align-items: center; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+#screenwrap { flex: 1 1 auto; width: 100%; display: flex; align-items: center; justify-content: center; min-height: 0; padding: 8px; }
+#screen { image-rendering: pixelated; image-rendering: crisp-edges; background: #f8f8f0; border: 4px solid #1a1a2a; border-radius: 4px; box-shadow: 0 4px 0 #22223a; }
+#pad { flex: 0 0 auto; width: 100%; max-width: 480px; display: flex; align-items: center; justify-content: space-between; padding: 8px 20px 18px; position: relative; }
+#dpad { width: 148px; height: 148px; position: relative; touch-action: none; }
+#dpad .k { position: absolute; background: #1a1a2a; width: 48px; height: 48px; }
+#dpad .u { left: 50px; top: 2px; border-radius: 6px 6px 0 0; } #dpad .dn { left: 50px; top: 98px; border-radius: 0 0 6px 6px; }
+#dpad .l { left: 2px; top: 50px; border-radius: 6px 0 0 6px; } #dpad .r { left: 98px; top: 50px; border-radius: 0 6px 6px 0; }
+#dpad .c { left: 50px; top: 50px; }
+#dpad[data-dir=up] .u, #dpad[data-dir=down] .dn, #dpad[data-dir=left] .l, #dpad[data-dir=right] .r { background: #4a4a6a; }
+.ab { display: flex; gap: 14px; transform: rotate(-20deg); margin-top: -10px; }
+.btn { width: 64px; height: 64px; border-radius: 50%; background: #c03050; color: #fff; font-size: 22px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 0 #702030; touch-action: none; }
+.btn.on { transform: translateY(3px); box-shadow: 0 1px 0 #702030; }
+.btn.b { margin-top: 30px; }
+.small { position: absolute; left: 50%; bottom: 4px; transform: translateX(-50%); display: flex; gap: 18px; }
+.pill { padding: 4px 14px; border-radius: 12px; background: #1a1a2a; color: #c8c8d8; font-size: 12px; touch-action: none; }
+.pill.on { background: #4a4a6a; }
+#mute { position: fixed; right: 10px; top: calc(env(safe-area-inset-top) + 8px); background: none; border: 0; font-size: 20px; opacity: .7; cursor: pointer; }
+#help { position: fixed; left: 10px; top: calc(env(safe-area-inset-top) + 10px); font-size: 12px; color: #9a9ab8; line-height: 1.6; }
+#namebox { position: fixed; inset: 0; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; z-index: 9; }
+#namebox[hidden] { display: none; }
+#namebox .card { background: #f8f8f0; color: #202028; padding: 18px; border: 4px solid #202028; border-radius: 6px; width: min(300px, 90vw); }
+#namebox input { font: 18px Cubic11, sans-serif; width: 100%; padding: 6px; margin: 10px 0; border: 2px solid #202028; }
+#namebox button { font: 16px Cubic11, sans-serif; width: 100%; padding: 8px; background: #3a6ee8; color: #fff; border: 0; border-radius: 4px; }
+@media (min-width: 900px) and (hover: hover) { #pad { display: none; } }
+@media (max-width: 899px), (hover: none) { #help { display: none; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="screenwrap"><canvas id="screen" width="160" height="144"></canvas></div>
+  <div id="pad">
+    <div id="dpad"><div class="k u"></div><div class="k dn"></div><div class="k l"></div><div class="k r"></div><div class="k c"></div></div>
+    <div class="ab"><div class="btn b" data-b="b">B</div><div class="btn" data-b="a">A</div></div>
+    <div class="small"><div class="pill" data-b="start">START 選單</div></div>
+  </div>
+</div>
+<button id="mute" aria-label="音效開關">🔊</button>
+<div id="help">方向鍵 / WASD：移動<br>Z / 空白：A（確定、對話）<br>X / Esc：B（取消，按住可跑步）<br>Enter：START（選單）</div>
+<div id="namebox" hidden><div class="card"><div id="nameq">名字</div><input id="nameinput" maxlength="6"><button id="nameok">決定</button></div></div>
+<script src="js/data.js"></script>
+<script src="js/art.js"></script>
+<script src="js/maps.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/battle.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
