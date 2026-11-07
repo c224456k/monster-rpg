@@ -355,9 +355,11 @@ class Battle {
         for (let i = 0; i <= 16; i++) { this.trIn = 1 - i / 16; await g.wait(1); }
         await this.say(`打敗了\n${this.tr.cls}${this.tr.name}！`);
         if (this.tr.post) await this.say(this.tr.post);
-        const money = this.tr.money;
-        g.p.money += money;
-        await this.say(`${g.p.name}得到了\n$${money}！`);
+        if (!Feixu.linked) { // 有連費許時不發獎金（只花不賺，避免改前端刷錢）
+          const money = this.tr.money;
+          g.p.money += money;
+          await this.say(`${g.p.name}得到了\n$${money}！`);
+        }
       }
     }
     for (const m of g.p.party) { if (m.st === 'slp' && m.slp <= 0) m.st = null; }

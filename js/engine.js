@@ -273,6 +273,8 @@ class Game {
     if (b >= 2) stock.push('revive');
     if (b >= 3) stock.push('uball', 'hpotion');
     stock.sort((a, c) => ITEM_ORDER.indexOf(a) - ITEM_ORDER.indexOf(c));
+    if (Feixu.linked) await Feixu.refresh();
+    const wallet = () => (Feixu.linked ? Feixu.cash || 0 : this.p.money);
     let sel = 0;
     for (;;) {
       const items = stock.map((k) => ITEMS[k].n).concat(['離開']);
@@ -283,18 +285,21 @@ class Game {
             drawText(ctx, `$${ITEMS[stock[i]].price}`, 112, 6 + (i - sc.top) * 16, INK);
             wrapText(ctx, ITEMS[stock[i]].d, 142).slice(0, 2).forEach((l, k) => drawText(ctx, l, 8, 104 + k * 16));
           } else drawText(ctx, '謝謝光臨！', 8, 104);
-          drawBox(ctx, 96, 72, 64, 24); drawText(ctx, `$${this.p.money}`, 102, 78);
+          drawBox(ctx, 96, 72, 64, 24); drawText(ctx, `$${fmtMoney(wallet())}`, 102, 78);
         } });
       const i = await this.push(sc);
       if (i < 0 || i >= stock.length) break;
       sel = i;
       const it = ITEMS[stock[i]];
-      const max = Math.min(99, Math.floor(this.p.money / it.price));
+      const max = Math.min(99, Math.floor(wallet() / it.price));
       if (max <= 0) { await this.say('錢不夠喔！'); continue; }
       const n = await this.push(new QtyScene(this, it.price, max));
       if (!n) continue;
       if (await this.ask(`${it.n} x${n}，\n一共 $${n * it.price}。\n可以嗎？`)) {
-        this.p.money -= n * it.price;
+        if (Feixu.linked) {
+          const r = await Feixu.buy(stock[i], n);
+          if (!r.ok) { await this.say(r.message || '買不了…'); continue; }
+        } else this.p.money -= n * it.price;
         this.addItem(stock[i], n);
         this.sfx('buy');
         await this.say('謝謝惠顧！');
@@ -328,8 +333,9 @@ class Game {
     if (r === 'lose') {
       if (opt.canLose) { this.healParty(); return r; }
       await this.say(`${this.p.name}沒有可以戰鬥的萌獸了…`);
-      const lost = Math.min(this.p.money, 10000); // 全滅最多扣 1 萬
-      this.p.money -= lost;
+      let lost; // 全滅最多扣 1 萬（有登入費許就扣費許現金）
+      if (Feixu.linked) { const r = await Feixu.blackout(); lost = r.ok ? r.lost : 0; }
+      else { lost = Math.min(this.p.money, 10000); this.p.money -= lost; }
       await this.say(`${this.p.name}慌張地掉了\n$${lost}……\n眼前一片漆黑！`);
       await this.fadeOut(20);
       const rs = this.p.respawn;
@@ -923,7 +929,7 @@ class CardScene {
     drawText(ctx, '訓練家卡', 12, 10);
     ctx.drawImage(personFrames('hero')[0][0], 120, 14, 32, 32);
     drawText(ctx, `名字  ${p.name}`, 12, 30);
-    drawText(ctx, `金錢  $${p.money}`, 12, 46);
+    drawText(ctx, Feixu.linked ? `費許  $${fmtMoney(Feixu.cash)}` : `金錢  $${fmtMoney(p.money)}`, 12, 46);
     drawText(ctx, `圖鑑  ${p.caught.length} 種`, 12, 62);
     const t = Math.floor(p.time / 60);
     drawText(ctx, `時間  ${Math.floor(t / 3600)}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}`, 12, 78);

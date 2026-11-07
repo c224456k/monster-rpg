@@ -5,6 +5,7 @@ function makeCanvas(w, h) { const c = document.createElement('canvas'); c.width 
 (async function boot() {
   const cv = document.getElementById('screen');
   try { await Promise.race([document.fonts.load('12px Cubic11'), new Promise((r) => setTimeout(r, 4000))]); } catch (e) { /* 字型載不到就用系統字 */ }
+  Feixu.init(); // 有登入費許網站就用費許現金
   const chip = new Chip();
   let store = null;
   try { store = window.localStorage; store.setItem('_t', '1'); store.removeItem('_t'); } catch (e) { store = null; }
